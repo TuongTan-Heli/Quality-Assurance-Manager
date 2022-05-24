@@ -1,0 +1,43 @@
+﻿@model IEnumerable<WebApplication2.Models.Department>
+
+@{
+    ViewBag.Title = "List departments";
+}
+
+<center>
+    <h2>List departments</h2>
+</center>
+<p>
+    @Html.ActionLink("Create New", "Create", "Departments", new { @class = "btn btn-success" })
+</p>
+<br />
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-success">
+        <strong>@TempData["AlertMessage"]</strong>
+    </div>
+}
+<br />
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.DepartName)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.DepartName)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", "Departments", new { id = item.DepartId }, new { @class = "btn btn-primary" }) |
+                @Html.ActionLink("Details", "Details", "Departments", new { id = item.DepartId }, new { @class = "btn btn-success" }) |
+                @Html.ActionLink("Delete", "Delete", "Departments", new { id = item.DepartId }, new { @class = "btn btn-danger" })
+            </td>
+        </tr>
+    }
+
+</table>

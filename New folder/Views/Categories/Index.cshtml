@@ -1,0 +1,54 @@
+﻿@model IPagedList<WebApplication2.Models.Category>
+
+@{
+    ViewBag.Title = "Manage categories";
+}
+@using PagedList.Mvc;
+@using PagedList;
+<center><h2>List categories</h2></center>
+<br />
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-success">
+        <strong>@TempData["AlertMessage"]</strong>
+    </div>
+}
+<br />
+<p>
+    @Html.ActionLink("Create New", "Create", "Categories", new { @class = "btn btn-primary"})
+</p>
+@using (Html.BeginForm("Index", "Categories", FormMethod.Post))
+{
+    <input type="text" name="search" placeholder="Enter Category name" />
+    <input type="submit" name="submit" value="Search" class="btn btn-success"/>
+}
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.First().CateName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().CateDescription)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CateName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CateDescription)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.CateId }, new { @class = "btn btn-primary" }) |
+                @Html.ActionLink("Details", "Details", new { id = item.CateId }, new { @class = "btn btn-success" }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.CateId }, new { @class = "btn btn-danger" })
+            </td>
+        </tr>
+    }
+
+</table>
+@Html.PagedListPager(Model, i => Url.Action("Index", "Categories", new { i, search = Request.QueryString["search"] }))

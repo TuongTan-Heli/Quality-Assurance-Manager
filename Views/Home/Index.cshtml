@@ -1,0 +1,20 @@
+﻿@model WebApplication2.Models.Idea
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "Home Page";
+}
+<br />
+<br />
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-success">
+        <strong>@TempData["AlertMessage"]</strong>
+    </div>
+}
+<br />
+<div class="position-center">
+   
+</div>
+@section scripts{
+    <script src="~/Scripts/JavaScript.js"></script>
+}

@@ -1,0 +1,26 @@
+﻿@model WebApplication2.Models.Department
+
+@{
+    ViewBag.Title = "Details departments";
+}
+
+<center><h2>Details departments</h2></center>
+
+<div>
+    <h4>Department</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DepartName)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", "Departments", new { id = Model.DepartId }, new { @class = "btn btn-success" }) |
+    @Html.ActionLink("Back to List", "Index", "Departments", new { @class = "btn btn-primary" })
+</p>

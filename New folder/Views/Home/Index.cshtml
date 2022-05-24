@@ -1,0 +1,89 @@
+﻿@model WebApplication2.Models.Idea
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "Create ideas";
+}
+<br />
+<br />
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-success">
+        <strong>@TempData["AlertMessage"]</strong>
+    </div>
+}
+<br />
+<center><strong style="font-size: 50px">Create ideas</strong></center>
+<div class="row">
+    <div class="col-md-6">
+        <div class="position-center">
+            @using (Html.BeginForm("Create", "Ideas", FormMethod.Post, new { enctype = "multipart/form-data", id = "CreateForm" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-horizontal">
+
+                    <hr />
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        @Html.Label( "Title" ,new { @class = "control-label col-md-3" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.IdeaTitle, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.IdeaTitle, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Category", new { @class = "control-label col-md-3" })
+                        <div class="col-md-8">
+                            @Html.DropDownList("Categories", null, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Category, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Title", new { @class = "control-label col-md-3" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.IdeaDescription, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.IdeaDescription, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Content", new { @class = "control-label col-md-3" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.IdeaContent, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.IdeaContent, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Post this anonymously?", htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-8">
+                            @Html.CheckBoxFor(model => model.Anonymous, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Anonymous, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">   File</label>
+                        <div class="col-md-8">
+                            <input type="file" name="file" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-3 col-md-12">
+                            <input type="submit" value="Create" class="btn btn-success" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-md-6">
+        <br />
+        <center><img style="height: 430px; width:398px" src="~/Image/logo.png" /></center>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/JavaScript.js"></script>
+}

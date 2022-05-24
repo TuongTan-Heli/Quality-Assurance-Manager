@@ -1,0 +1,49 @@
+﻿@model WebApplication2.Models.Submission
+
+@{
+    ViewBag.Title = "Details submissions";
+}
+
+<center><h2>Details submission</h2></center>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.SubName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SubName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SubDescription)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SubDescription)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Closure_date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Closure_date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Final_closure_date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Final_closure_date)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit","Submissions", new { id = Model.SubId }, new {@class="btn btn-success"}) |
+    @Html.ActionLink("Back to List", "Index", "Submissions", new {@class="btn btn-primary"})
+</p>

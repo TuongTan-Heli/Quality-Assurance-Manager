@@ -1,0 +1,42 @@
+﻿@model WebApplication2.Models.File
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>File</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FilePath)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FilePath)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Create_date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Create_date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Last_modified)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Last_modified)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.FileId }, new { @class = "btn btn-primary" }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

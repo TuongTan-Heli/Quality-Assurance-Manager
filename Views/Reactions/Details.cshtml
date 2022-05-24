@@ -1,0 +1,26 @@
+﻿@model WebApplication2.Models.Reaction
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Reaction</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.React)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.React)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ReactId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

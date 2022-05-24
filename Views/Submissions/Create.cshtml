@@ -1,0 +1,79 @@
+﻿@model WebApplication2.Models.Submission
+
+@{
+    ViewBag.Title = "Create submissions";
+}
+
+<center><h2>Create submissions</h2></center>
+
+
+<div class="row">
+    <div class="col-md-6">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <h4>Submission</h4>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.Label("Name", new { @class = "control-label col-md-3" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.SubName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.SubName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Description", new { @class = "control-label col-md-3" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.SubDescription, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.SubDescription, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.Label("Open date", new { @class = "control-label col-md-3" })
+                    <div class="col-md-8">
+                        <input type="date" name="OpenDate" class="form-control" />
+                        @Html.ValidationMessage("OpenDate", "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.Label("Clost date", new { @class = "control-label col-md-3" })
+                    <div class="col-md-8">
+                        <input type="date" name="CloseDate" class="form-control" />
+                        @Html.ValidationMessage("CloseDate", "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Final date", new { @class = "control-label col-md-3" })
+                    <div class="col-md-8">
+                        <input type="date" name="FinalCloseDate" class="form-control" />
+                        @Html.ValidationMessage("FinalCloseDate", "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-md-8">
+                        <input type="submit" value="Create" class="btn btn-success" />
+                        @Html.ActionLink("Back to List", "Index", "Submissions", new { @class = "btn btn-primary" })
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-md-6">
+        <img style="height:540px; width:540px" src="~/Image/logo.png" />
+
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,34 @@
+﻿@model IEnumerable<WebApplication2.Models.View>
+
+@{
+    ViewBag.Title = "List views";
+}
+
+<center>
+    <h2>List views</h2>
+</center>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Last_visited)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Last_visited)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit" ,"Views", new { id=item.ViewId }, new {@class="btn btn-primary"}) |
+            @Html.ActionLink("Details", "Details", "Views", new { id=item.ViewId }, new { @class = "btn btn-success" }) |
+            @Html.ActionLink("Delete", "Delete", "Views", new { id=item.ViewId }, new { @class = "btn btn-danger" })
+        </td>
+    </tr>
+}
+
+</table>

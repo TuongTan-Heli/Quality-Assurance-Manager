@@ -1,0 +1,339 @@
+﻿@model WebApplication2.Models.Idea
+
+@{
+    ViewBag.Title = "Details ideas";
+}
+@using WebApplication2.Models;
+@using Microsoft.AspNet.Identity;
+@{ ApplicationDbContext db = new ApplicationDbContext();}
+
+
+<div>
+    <h2 style="text-align:center">Idea @Model.IdeaTitle details</h2>
+    <hr />
+    <dl class="dl-horizontal">
+        <!--mỗi cái <dt> và <dd> tượng trưng cho 1 hàng-->
+        <dt>
+            Title :
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IdeaTitle)
+        </dd>
+
+        <dt>
+            Description :
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IdeaDescription)
+        </dd>
+
+        <dt>
+            Content :
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IdeaContent)
+        </dd>
+        <dt>
+            Author :
+        </dt>
+      
+        <dd>
+            @if (Model.Anonymous)
+            {
+                <h5>(hidden)</h5>
+            }
+            else
+            {
+                Html.DisplayFor(model => model.Author.UserName);
+
+            }
+
+        </dd>
+        <dt>
+            Category :
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Category.CateName)
+        </dd>
+        <dt>
+            Department :
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Department.DepartName)
+        </dd>
+        <dt>
+            Submission :
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Submission.SubName)
+            (@Model.Submission.Open_date.ToShortDateString() - @Model.Submission.Closure_date.ToShortDateString() )
+        </dd>
+        <dt>
+            Created date :
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Created_date)
+        </dd>
+
+        <dt>
+            Last modified :
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Last_modified)
+            <hr />
+        </dd>
+        <dt>File : </dt>
+        <dd>
+            <!--phần file-->
+            @using (Html.BeginForm("UploadFile", "Ideas", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <input style="display:none" type="number" name="IdeaId" id=@Model.IdeaId value=@Model.IdeaId />
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <input type="file" name="file" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-7">
+                        <input type="submit" value="Upload" class="btn btn-success" />
+                    </div>
+                </div>
+
+            }
+            @{
+                List<Document> documents = ViewBag.documents;
+            }
+
+            @if (documents.Where(x => x.Idea == Model).ToList().Count != 0)
+            {
+                @Html.ActionLink("Get File", "GetFile", "Ideas", new { IdeaId = Model.IdeaId }, new { @class = "btn btn-info" })
+                @Html.ActionLink("Delete File", "DeleteFile", "Ideas", new { IdeaId = Model.IdeaId }, new { @class = "btn btn-danger" })
+            }
+            <hr />
+        </dd>
+        <dt>
+            Comment :
+        </dt>
+        <dd>
+            <!--phần comment-->
+
+            <div>
+                <a onclick="ChangeToComment(@Model.IdeaId)">Comment on this idea</a>
+            </div>
+
+            <hr />
+            <!--phần hiện comment-->
+            @foreach (Comment comment in Model.Comments)
+            {
+
+
+
+                <div>
+                    @if (!comment.Anonymous)
+                    {
+                        <div>User : @comment.Author.UserName</div>
+                    }
+
+                    - @comment.Content -
+                    <a onclick="ChangeToReply(@comment.CommentId)">Reply to this comment</a>
+                    <hr />
+                </div>
+                @RecursionComment(comment);
+                @helper RecursionComment(Comment comment1)
+                {
+                    <div>
+                        @foreach (Comment reply in comment1.Replys)
+                        {
+                            <div style="margin-left:15px;">
+                                @if (!reply.Anonymous)
+                                {
+                                    <div>User : @reply.Author.UserName</div>
+                                }
+
+                                - @reply.Content -
+                                <a onclick="ChangeToReply(@reply.CommentId)">Reply to this comment</a>
+                                <hr />
+                                @if (reply.Replys.Count != 0)
+                                {
+                                    @RecursionComment(reply);
+                                }
+
+                            </div>
+                        }
+
+                    </div>
+
+                }
+
+            }
+            <!--chỗ để viết comment-->
+            @using (Html.BeginForm("Comment", "Ideas", FormMethod.Post))
+            {
+
+                <div class="form-inline">
+                    <input class="form-control" type="text" name="Comment" placeholder="Enter Comment" />
+                    <input class="btn btn-default" type="submit" value="Comment" />
+                </div>
+
+                <input style="display:none" type="number" name="CommentId" id=@Model.IdeaId value=0 />
+                <input style="display:none" type="number" name="IdeaId" id=@Model.IdeaId value=@Model.IdeaId />
+                <div class="form-inline">
+                    @Html.CheckBox("Anonymous", new { htmlAttributes = new { @class = "form-control" } })
+                    Post this comment anonymously?
+                </div>
+
+                <hr />
+
+             }
+
+
+        </dd>
+        <dt>
+            React :
+            <!--phần like & dislike-->
+        </dt>
+        <dd>
+            <div class="form-inline">
+                <!--nút like-->
+                @using (Html.BeginForm("React", "Ideas", FormMethod.Post))
+                {
+                    {
+                        <input style="display:none" type="number" name="IdeaId" id=@Model.IdeaId value=@Model.IdeaId />
+
+                        Idea idea = db.Ideas.Find(Model.IdeaId);
+                        ApplicationUser user = db.Users.Find(User.Identity.GetUserId());
+                        List<Reaction> reactions = db.Reactions.ToList();
+                        //Đã react
+
+                        if (reactions.Where(x => x.User == user && x.Idea == idea).ToList().Count != 0)
+                        {
+                            bool react = reactions.Where(x => x.User == user && x.Idea == idea).ToList()[0].React;
+                            if (react)
+                            {//React là like
+                                <button name="React" class="btn btn-default" value="null"><i class="fa fa-thumbs-up"></i> Like</button>
+                            }
+                            else
+                            {
+                                <button name="React" class="btn btn-default" value="1"><i class="fa fa-thumbs-o-up"></i> Like</button>
+                            }
+                        }
+                        else
+                        //chưa react
+                        {
+                            <button name="React" class="btn btn-default" value="1"><i class="fa fa-thumbs-o-up"></i> Like</button>
+                        }
+
+                    }
+
+                }
+                <!--nút dislike-->
+                @using (Html.BeginForm("React", "Ideas", FormMethod.Post))
+                {
+                    {
+                        <input style="display:none" type="number" name="IdeaId" id=@Model.IdeaId value=@Model.IdeaId />
+                        Idea idea = db.Ideas.Find(Model.IdeaId);
+                        ApplicationUser user = db.Users.Find(User.Identity.GetUserId());
+                        List<Reaction> reactions = db.Reactions.ToList();
+                        //Đã react
+                        if (reactions.Where(x => x.User == user && x.Idea == idea).ToList().Count != 0)
+                        {
+                            bool react = reactions.Where(x => x.User == user && x.Idea == idea).ToList()[0].React;
+                            if (!react)
+                            {//React là unlike
+                                <button name="React" class="btn btn-default" value="null"><i class="fa fa-thumbs-down"></i> Dislike</button>
+                            }
+                            else
+                            {
+                                <button name="React" class="btn btn-default" value="0"><i class="fa fa-thumbs-o-down"></i> Dislike</button>
+                            }
+                        }
+                        else
+                        //chưa react
+                        {
+                            <button name="React" class="btn btn-default" value="0"><i class="fa fa-thumbs-o-down"></i> Dislike</button>
+                        }
+
+                    }
+
+
+
+                }
+
+            </div>
+        </dd>
+        <dt>
+            Reaction list :
+        </dt>
+        <dd>
+            <p>
+                <!--số lượt like-->
+                Like count : @Model.Reactions.Where(x => x.React).Count()
+            </p>
+            <p>
+                <!--số lượt dislike-->
+                Dislike count :@Model.Reactions.Where(x => x.React == false).Count()
+            </p>
+            <br />
+            <!--hiện thông tin của người like hoặc dislike-->
+            @foreach (Reaction reaction in Model.Reactions)
+            {
+                <p>
+                    @reaction.User.UserName :
+                    @if (reaction.React)
+                    {
+                        <h5>Like</h5>
+                    }
+                    else
+                    {
+                        <h5>Dislike</h5>
+                    }
+                </p>
+            }
+            <hr />
+        </dd>
+        <dt>
+            View Count :
+        </dt>
+        <dd>
+            <!--số lượt view-->
+            @Model.Views.Count()
+        </dd>
+        <dt>
+            View list :
+        </dt>
+        <dd>
+            <!--hiện thông tin người đã xem idea-->
+            @foreach (View view in Model.Views)
+            {
+                if (view.User != null)
+                {
+                    <p>
+                        User : @view.User.UserName : Last seen : @view.Last_visited
+                    </p>
+                }
+
+            }
+
+        </dd>
+    </dl>
+
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.IdeaId }, new { @class = "btn btn-primary" }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+@section scripts{
+    <script src="~/Scripts/JavaScript.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!--https://fontawesome.com/v4/icons/-->
+}

@@ -1,0 +1,234 @@
+﻿@model IPagedList<WebApplication2.Models.Idea>
+
+@using WebApplication2.Models
+@using PagedList.Mvc;
+@using PagedList;
+@{
+    ViewBag.Title = "View";
+    ApplicationDbContext db = new ApplicationDbContext();
+    List<Submission> Submission = db.Submissions.ToList();
+    ViewBag.Submission = new SelectList(Submission, "SubName", "SubName");
+
+}
+
+<h2 style="text-align:center">Idea analysis in submission @ViewBag.CurrSubmission.SubName (@ViewBag.CurrSubmission.Open_date.ToLongDateString()-@ViewBag.CurrSubmission.Closure_date.ToLongDateString())</h2>
+<hr />
+<!--phần để chọn submission-->
+@using (Html.BeginForm("Analysis", "Ideas", FormMethod.Post))
+{
+    <div class="form-inline">
+        Select submission :
+        @Html.DropDownList("Submission", null, htmlAttributes: new { @class = "form-control" })
+        <input type="submit" value="Sort" class="form-control" />
+
+    </div>
+}
+<!--download file excel dựa trên submission đã chọn-->
+@Html.ActionLink("Download CSV", "DownloadCSV", "Ideas", new { Submission = ViewBag.CurrSubmission.SubName }, null)
+<hr />
+
+<div id="chart_container ">
+    <center><strong>Number of idea made by each department</strong></center>
+    <canvas id="bar_chart">
+    </canvas>
+</div>
+<div class="row" style="margin-top:10px;margin-bottom:10px;">
+    <div class="col-md-6">
+        <!--biểu đồ tổng số idea theo department-->
+        <div class="card-cus">
+
+            <center><strong> <i class="fa fa-lightbulb-o" aria-hidden="true"></i> Total idea submitted :@ViewBag.Total</strong></center>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <!--tổng số idea trong submission và tổng số người đăng idea-->
+        <div class="card-cus">
+
+            <center><strong><i class="fa fa-user" aria-hidden="true"></i> Total number of contributor: @ViewBag.Authors</strong></center>
+        </div>
+
+
+    </div>
+
+
+</div>
+<div class="row">
+    <div class="col-md-4 card card-cus">
+
+        <!--idea nhiều like nhất-->
+        <center><strong style="font-size:20px;">Most liked idea </strong></center>
+
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <center><i style="font-size:70px; color:blue" class="fa fa-thumbs-up " aria-hidden="true"></i></center>
+            </div>
+            <div class="col-md-6">
+                <p>
+                    Idea Title:
+                    @ViewBag.LikeIdea.IdeaTitle
+                </p>
+                <p>
+                    Like Count:
+                    @ViewBag.LikeIdeaCount
+                </p>
+
+
+            </div>
+        </div>
+
+
+
+
+        <p>  @Html.ActionLink("Details", "Details", new { id = ViewBag.LikeIdea.IdeaId }, new { @class = "btn btn-primary", @style = "float:right" })</p>
+
+    </div>
+    <div class="col-md-3 card card-cus">
+
+        <!--idea nhiều like nhất-->
+        <center><strong style="font-size:20px;">Most comment idea </strong></center>
+
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <center><i style="font-size:70px; color:green" class="fa fa-comment " aria-hidden="true"></i></center>
+            </div>
+            <div class="col-md-6">
+                <p>Idea Title: @ViewBag.CommentIdea.IdeaTitle</p>
+                <p>Comment Count:  @ViewBag.CommentIdeaCount</p>
+            </div>
+        </div>
+
+
+
+
+        <p>  @Html.ActionLink("Details", "Details", new { id = ViewBag.CommentIdea.IdeaId }, new { @class = "btn btn-primary", @style = "float:right" })</p>
+
+    </div>
+    <div class="col-md-4 card card-cus">
+
+        <!--idea nhiều like nhất-->
+        <center><strong style="font-size:20px;">Most viewed idea </strong></center>
+
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <center><i style="font-size:70px; color:red" class="fa fa-eye " aria-hidden="true"></i></center>
+            </div>
+            <div class="col-md-6">
+                <p> Idea Title:  @ViewBag.ViewIdea.IdeaTitle</p>
+                <p>View Count:  @ViewBag.ViewIdeaCount</p>
+
+            </div>
+        </div>
+
+
+
+
+        <p>  @Html.ActionLink("Details", "Details", new { id = ViewBag.CommentIdea.IdeaId }, new { @class = "btn btn-primary", @style = "float:right" })</p>
+
+    </div>
+
+</div>
+<center><h2>Idea list</h2></center>
+<table class="table">
+
+    <tr style="background-color:cornflowerblue;">
+        <!--Hàng đầu để tên cột-->
+        <th>
+            Title
+        </th>
+        <th>
+            Description
+        </th>
+
+        <th>
+            Category
+        </th>
+        <th>
+            Author
+        </th>
+        <th> </th>
+    </tr>
+    @foreach (Idea idea in Model)
+    {
+        <tr>
+            <!--Hàng đầu để tên cột-->
+            <th>
+                @idea.IdeaTitle
+            </th>
+            <th>
+                @idea.IdeaDescription
+            </th>
+
+            <th>
+                @idea.Category.CateName
+            </th>
+            <th>
+                @idea.Author.UserName
+            </th>
+            <th>
+                @Html.ActionLink("Details", "Details", "Ideas", new {id=idea.IdeaId},new {@class="btn btn-success"})
+            </th>
+        </tr>
+    }
+</table>
+@Html.PagedListPager(Model, i => Url.Action("Analysis", "Ideas", new { i }))
+
+
+
+
+
+
+
+
+@section scripts{
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/Chart.min.js"></script>
+
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/JavaScript.js"></script>
+    <link href="~/Content/Style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!--https://fontawesome.com/v4/icons/-->
+    <script>
+
+        var RepArray =@Html.Raw(Json.Encode(ViewBag.Repatrition));
+        var ColorArray = [];
+
+        $.each(RepArray, function () {
+            var r = randomInt(1, 255);
+            var g = randomInt(1, 255);
+            var b = randomInt(1, 255);
+
+            ColorArray.push(`rgba(${r},${g}, ${b}, 0.5)`);
+        });
+
+        console.log(ColorArray);
+        var DepartmentArray =@Html.Raw(Json.Encode(ViewBag.deparmentNames));
+        var container = $('#chart_container');
+        var ctx = $("#bar_chart");
+        var barChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: DepartmentArray,
+                datasets: [{
+                    label: DepartmentArray,
+                    data: RepArray,
+                    backgroundColor: ColorArray,
+                }]
+            },
+
+            options: {
+
+                maintainAspectRatio: false,
+
+            },
+
+        });
+        function randomInt(min, max) { // min and max included
+            return Math.floor(Math.random() * (max - min + 1) + min)
+        }
+    </script>
+}

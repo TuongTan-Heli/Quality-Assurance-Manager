@@ -1,0 +1,338 @@
+﻿@model IPagedList<WebApplication2.Models.Idea>
+
+@{
+    ViewBag.Title = "Manage ideas";
+}
+@using WebApplication2.Models;
+@using PagedList.Mvc;
+@using PagedList;
+@using Microsoft.AspNet.Identity;
+@{ ApplicationDbContext db = new ApplicationDbContext();}
+@{ List<string> Sort = new List<string>() { "Lastest", "Most Liked", "Most Viewed", "Most Comments" };
+    ViewBag.Sort = new SelectList(Sort, "Sort");
+    List<Document> documents = ViewBag.documents;
+}
+<center><h2>Manage ideas</h2></center>
+
+<p>
+    <!--2 cái link để tạo và tải file excel-->
+    @Html.ActionLink("Create New", "Create", "Ideas", new { @class = "btn btn-primary" }) |
+    @Html.ActionLink("Download CSV", "DownloadCSV", "Ideas", new { @class = "btn btn-primary" }) |
+    @Html.ActionLink("Analysis idea", "Analysis", "Ideas", new { @class = "btn btn-primary" })
+
+
+</p>
+<br />
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-success">
+        <strong>@TempData["AlertMessage"]</strong>
+    </div>
+}
+<br />
+<!--phần để sort và search idea-->
+@using (Html.BeginForm("Index", "Ideas", FormMethod.Post))
+{
+    <div class="form-inline">
+        <input type="text" name="search" placeholder="Enter search title" class="form-control" />
+        @Html.DropDownList("Sort", null, htmlAttributes: new { @class = "form-control" })
+        <input type="submit" value="Sort & Search" class="btn btn-success" />
+        <hr />
+    </div>
+
+}
+<!--bắt đầu bảng idea-->
+<table class="table">
+
+    <tr>
+        <!--Hàng đầu để tên cột-->
+        <th>
+            Title
+        </th>
+        <th>
+            Description
+        </th>
+
+        <th>
+            Category
+        </th>
+        <th>
+            Author
+        </th>
+        <th></th>
+    </tr>
+    <!--Hàng 2 trở đi show từng idea ra-->
+    @foreach (var item in Model)
+    {
+        //bấm vào hàng này hiện ra 1 hàng show thông tin của idea
+        <tr onclick="Show(this,@item.IdeaId);" id="a">
+            <td>
+                @Html.DisplayFor(modelItem => item.IdeaTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdeaDescription)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.CateName)
+            </td>
+            <td>
+                @if (item.Anonymous)
+                {
+                    <p>Author : (Hidden)</p>
+
+                }
+                else
+                {
+                    <p>Author : @item.Author.UserName</p>
+                }
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.IdeaId }, new { @class = "btn btn-primary" }) |
+                @Html.ActionLink("Details", "Details", new { id = item.IdeaId }, new { @class = "btn btn-success" }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.IdeaId }, new { @class = "btn btn-danger" })
+            </td>
+        </tr>
+        //hàng hiện ra sau khi bấm hàng trước
+        <tr style="display:none;">
+            <td>
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="card-cus-1">
+                            @item.IdeaContent
+                        </div>
+                        <div class="card-cus-1">
+                            <!--phần này bắt đầu show tất cả comment-->
+                            @foreach (Comment comment in item.Comments)
+                            {
+
+
+
+                                <div>
+                                    @if (comment.Anonymous)
+                                    {
+                                        //hiện tên ng đăng
+
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <i style="font-size:50px;" class="fa fa-user" aria-hidden="true"></i>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div>
+
+                                                    Anonymous - <a onclick="ChangeToReply(@comment.CommentId)">Reply</a>
+                                                    <div>
+                                                        @comment.Content
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <i style="font-size:50px;" class="fa fa-user" aria-hidden="true"></i>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div>
+
+                                                    @comment.Author.UserName - <a onclick="ChangeToReply(@comment.CommentId)">Reply</a>
+                                                    <div>
+                                                        @comment.Content
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+
+                                    }
+
+                                    <!--hiện content của comment-->
+                                    <!--chuyển thành trả lời comment-->
+
+                                    <hr />
+                                </div>
+                                //phần này hiện reply của comment
+                                @RecursionComment(comment);
+                                @helper RecursionComment(Comment comment1)
+                                {
+                                    <div>
+                                        @foreach (Comment reply in comment1.Replys)
+                                        {
+                                            <div style="margin-left:25px;">
+                                                <div class="row">
+                                                    <div class="col-md-2">
+                                                        <i style="font-size:50px;" class="fa fa-user" aria-hidden="true"></i>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <div>
+                                                            @if (!reply.Anonymous)
+                                                            {
+                                                                //tên ng comment
+
+                                                                <div>@reply.Author.UserName - <a onclick="ChangeToReply(@reply.CommentId)">Reply</a></div>
+                                                                <div>@reply.Content</div>
+                                                            }
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <!--content-->
+                                                <!--chuyển thành trả lời comment-->
+
+                                                <hr />
+                                                @if (reply.Replys.Count != 0)
+                                                {
+                                                    @RecursionComment(reply);
+                                                }
+
+                                            </div>
+                                        }
+
+                                    </div>
+
+
+
+
+                                }
+
+
+                            }
+                            <!--phần này khung để viết comment-->
+                            @using (Html.BeginForm("Comment", "Ideas", FormMethod.Post))
+                            {
+
+                                <div class="form-inline">
+                                    <input class="form-control" type="text" name="Comment" placeholder="Enter Comment" />
+                                    <input class="btn btn-success" type="submit" value="Comment" />
+                                </div>
+
+                                <!--khỏi đụng 2 dòng này-->
+                                <input style="display:none" type="number" name="CommentId" id=@item.IdeaId value=0 />
+                                <input style="display:none" type="number" name="IdeaId" id=@item.IdeaId value=@item.IdeaId />
+
+
+
+                                <div class="form-inline">
+                                    @Html.CheckBox("Anonymous", new { htmlAttributes = new { @class = "form-control" } })
+                                    Post this comment anonymously?
+                                </div>
+
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="row">
+                            @Html.ActionLink("Edit", "Edit", new { id = item.IdeaId }, new { @class = "btn btn-primary", @style = "width:80%" })
+                        </div>
+                        <div class="row" style="margin-top:5px;">
+                            @Html.ActionLink("Get File", "GetFile", "Ideas", new { IdeaId = item.IdeaId }, new { @class = "btn btn-info", @style = "width:80%" })
+                        </div>
+                        <!--<div class="row" style="margin-top:5px;">
+                        <a style="width:80%" class="btn btn-warning" onclick="ChangeToComment(item.IdeaId)">Comment on this idea</a>
+                        </div>-->
+                    </div>
+                </div>
+
+
+            </td>
+
+            <td>
+
+                <!--nút like-->
+                @using (Html.BeginForm("React", "Ideas", FormMethod.Post))
+                {
+                    {
+                        <input style="display:none" type="number" name="IdeaId" id=@item.IdeaId value=@item.IdeaId />
+
+                        Idea idea = db.Ideas.Find(item.IdeaId);
+                        ApplicationUser user = db.Users.Find(User.Identity.GetUserId());
+                        List<Reaction> reactions = db.Reactions.ToList();
+                        //Đã react
+                        if (reactions.Where(x => x.User == user && x.Idea == idea).ToList().Count != 0)
+                        {
+                            bool react = reactions.Where(x => x.User == user && x.Idea == idea).ToList()[0].React;
+                            if (react)
+                            {//React là like
+                                <div class="row">
+                                    <button name="React" class="btn btn-primary" style="width:80%" value="null"><i class="fa fa-thumbs-up"></i> Like</button>
+                                </div>
+                            }
+                            else
+                            {<div class="row">
+                                    <button name="React" class="btn btn-default" style="width:80%" value="1"><i class="fa fa-thumbs-o-up"></i> Like</button>
+                                </div>
+                            }
+                        }
+                        else
+                        //chưa react
+                        { <div class="row">
+                                <button name="React" class="btn btn-default" style="width:80%" value="1"><i class="fa fa-thumbs-o-up"></i> Like</button>
+                            </div>
+                        }
+
+                    }
+
+                }
+                <!--nút dislike-->
+                @using (Html.BeginForm("React", "Ideas", FormMethod.Post))
+                {
+                    {
+                        <input style="display:none" type="number" name="IdeaId" id=@item.IdeaId value=@item.IdeaId />
+                        Idea idea = db.Ideas.Find(item.IdeaId);
+                        ApplicationUser user = db.Users.Find(User.Identity.GetUserId());
+                        List<Reaction> reactions = db.Reactions.ToList();
+                        //Đã react
+                        if (reactions.Where(x => x.User == user && x.Idea == idea).ToList().Count != 0)
+                        {
+                            bool react = reactions.Where(x => x.User == user && x.Idea == idea).ToList()[0].React;
+                            if (!react)
+                            {//React là unlike
+                                <div class="row" style="margin-top:5px;">
+                                    <button name="React" class="btn btn-danger" style="width:80%" value="null"><i class="fa fa-thumbs-down"></i> Dislike</button>
+                                </div>
+                            }
+                            else
+                            { <div class="row" style="margin-top:5px;">
+                                    <button name="React" class="btn btn-default" style="width:80%" value="0"><i class="fa fa-thumbs-o-down"></i> Dislike</button>
+                                </div>
+                            }
+                        }
+                        else
+                        //chưa react
+                        { <div class="row" style="margin-top:5px;">
+                                <button name="React" class="btn btn-default" style="width:80%" value="0"><i class="fa fa-thumbs-o-down"></i> Dislike</button>
+                            </div>
+                        }
+
+                    }
+
+                }
+
+            </td>
+            <td>
+                Created date : @item.Created_date.ToString()
+            </td>
+
+            <!--phần file của idea-->
+            <td>
+            </td>
+
+        </tr>
+
+    }
+
+</table>
+@Html.PagedListPager(Model, i => Url.Action("Index", "Ideas", new { i }))
+@section scripts{
+    <script src="~/Scripts/JavaScript.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!--https://fontawesome.com/v4/icons/-->
+    <link href="~/Content/Style.css" rel="stylesheet" />
+}

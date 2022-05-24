@@ -1,0 +1,68 @@
+﻿@model IEnumerable<WebApplication2.Models.Submission>
+
+@{
+    ViewBag.Title = "List submissions";
+}
+
+<center>
+    <h2>List submissions</h2>
+</center>
+<p>
+    @Html.ActionLink("Create New", "Create", "Submissions", new { @class = "btn btn-success" })
+</p>
+<br />
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-success">
+        <strong>@TempData["AlertMessage"]</strong>
+    </div>
+}
+<br />
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.SubName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SubDescription)
+        </th>
+        <th>
+
+            @Html.DisplayNameFor(model => model.Open_date)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Closure_date)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Final_closure_date)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubDescription)
+            </td>
+            <td>
+                @item.Open_date.ToLongDateString()
+            </td>
+            <td>
+                @item.Closure_date.Date.ToLongDateString()
+            </td>
+            <td>
+                @item.Final_closure_date.Date.ToLongDateString()
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", "Submissions", new { id = item.SubId }, new { @class = "btn btn-primary" }) |
+                @Html.ActionLink("Details", "Details", "Submissions", new { id = item.SubId }, new { @class = "btn btn-success" }) |
+                @Html.ActionLink("Delete", "Delete", "Submissions", new { id = item.SubId }, new { @class = "btn btn-danger" })
+            </td>
+        </tr>
+    }
+
+</table>

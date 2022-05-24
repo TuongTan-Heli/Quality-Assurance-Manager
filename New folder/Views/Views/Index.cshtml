@@ -1,0 +1,33 @@
+﻿@model IEnumerable<WebApplication2.Models.View>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Last_visited)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Last_visited)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ViewId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ViewId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ViewId })
+        </td>
+    </tr>
+}
+
+</table>
