@@ -18,7 +18,7 @@ namespace WebApplication2.Controllers
         // GET: Files
         public ActionResult Index()
         {
-            return View(db.Documents.ToList());
+            return View(db.Documents.ToList())
         }
 
         // GET: Files/Details/5
